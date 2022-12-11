@@ -12,6 +12,12 @@ HOME_ADDRESS = '2116 Mulberry Ln, Jenison, MI 49428'
 OUTPUT_CSV = 'Script_Output_Miles_{}.csv'
 SUCCESS_MESSAGE = 'Successfully populated {} in directory {}'
 
+def callGoogleAPI(formattedUrl):
+    response = requests.request('GET', formattedUrl)
+    if response.json().get('status') == 'REQUEST_DENIED':
+        raise Exception("Error: " + response.json().get('error_message'))
+    return response
+
 def callGeocodingAPI(address):
 
     def convertToAddressParameter(address):
@@ -22,12 +28,12 @@ def callGeocodingAPI(address):
 
     addressParameter = convertToAddressParameter(address)
     formattedUrl = GEOCODE_URL.format(addressParameter, API_KEY)
-    return requests.request('GET', formattedUrl)
+    return callGoogleAPI(formattedUrl)
     
 def callDirectionsAPI(originId, destinationId):
 
     formattedUrl = DIRECTIONS_URL.format(originId, destinationId, API_KEY)
-    return requests.request('GET', formattedUrl)
+    return callGoogleAPI(formattedUrl)
 
 def convertAddressToPlaceId(address):
     
